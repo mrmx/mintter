@@ -406,7 +406,6 @@ func newLibp2p(cfg config.P2P, device crypto.PrivKey, pool *sqlitex.Pool) (*ipfs
 			libp2p.EnableHolePunching(),
 			libp2p.EnableAutoRelay(autorelay.WithStaticRelays(DefaultRelays()),
 				autorelay.WithNumRelays(2),
-				autorelay.WithStaticRescan(cfg.StaticRelayRescan),
 				autorelay.WithBackoff(cfg.RelayBackoffDelay)),
 		)
 	}
