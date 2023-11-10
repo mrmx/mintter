@@ -7,6 +7,8 @@ import {
   nativeTheme,
   shell,
   autoUpdater,
+  dialog,
+  MessageBoxOptions,
 } from 'electron'
 import log from 'electron-log/main'
 import squirrelStartup from 'electron-squirrel-startup'
@@ -26,13 +28,6 @@ import {createAppMenu} from './app-menu'
 const OS_REGISTER_SCHEME = 'hm'
 
 if (IS_PROD_DESKTOP) {
-  // const url = `https://update.electronjs.org/MintterHypermedia/mintter/${
-  //   process.platform
-  // }-${process.arch}/${app.getVersion()}`
-
-  // this is for testing
-  const updateUrl = `https://update.electronjs.org/MintterHypermedia/mintter/${process.platform}-${process.arch}/${app.getVersion()}`
-  autoUpdater.setFeedURL({url: updateUrl})
   if (process.defaultApp) {
     if (process.argv.length >= 2) {
       app.setAsDefaultProtocolClient(OS_REGISTER_SCHEME, process.execPath, [
@@ -147,4 +142,47 @@ if (!gotTheLock) {
       })
     }
   })
+}
+
+function autoUpdate() {
+  // const url = `https://update.electronjs.org/MintterHypermedia/mintter/${
+  //   process.platform
+  // }-${process.arch}/${app.getVersion()}`
+
+  // this is for testing
+  const updateUrl = `https://update.electronjs.org/MintterHypermedia/mintter/${
+    process.platform
+  }-${process.arch}/${app.getVersion()}`
+  autoUpdater.setFeedURL({url: updateUrl})
+
+  if (IS_PROD_DESKTOP) {
+    setInterval(() => {
+      autoUpdater.checkForUpdates()
+    }, 60000)
+
+    autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+      log.debug('[MAIN]: AUTO-UPDATE: New version downloaded')
+      const dialogOpts: MessageBoxOptions = {
+        type: 'info',
+        buttons: ['Restart', 'Later'],
+        title: 'Application Update',
+        message: process.platform === 'win32' ? releaseNotes : releaseName,
+        detail:
+          'A new version has been downloaded. Restart the application to apply the updates.',
+      }
+
+      dialog.showMessageBox(dialogOpts).then((returnValue) => {
+        log.debug('[MAIN]: AUTO-UPDATE: Quit and Install')
+        if (returnValue.response === 0) autoUpdater.quitAndInstall()
+      })
+    })
+
+    autoUpdater.on('error', (message) => {
+      log.debug(
+        `[MAIN]: AUTO-UPDATE: There was a problem updating the application: ${message}`,
+      )
+      console.error('There was a problem updating the application')
+      console.error(message)
+    })
+  }
 }
