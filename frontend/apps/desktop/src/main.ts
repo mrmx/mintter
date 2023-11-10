@@ -1,5 +1,13 @@
 import * as Sentry from '@sentry/electron/main'
-import {BrowserWindow, Menu, app, ipcMain, nativeTheme, shell} from 'electron'
+import {
+  BrowserWindow,
+  Menu,
+  app,
+  ipcMain,
+  nativeTheme,
+  shell,
+  autoUpdater,
+} from 'electron'
 import log from 'electron-log/main'
 import squirrelStartup from 'electron-squirrel-startup'
 import path from 'node:path'
@@ -18,6 +26,13 @@ import {createAppMenu} from './app-menu'
 const OS_REGISTER_SCHEME = 'hm'
 
 if (IS_PROD_DESKTOP) {
+  // const url = `https://update.electronjs.org/MintterHypermedia/mintter/${
+  //   process.platform
+  // }-${process.arch}/${app.getVersion()}`
+
+  // this is for testing
+  const updateUrl = `https://update.electronjs.org/MintterHypermedia/mintter/${process.platform}-${process.arch}/${app.getVersion()}`
+  autoUpdater.setFeedURL({url: updateUrl})
   if (process.defaultApp) {
     if (process.argv.length >= 2) {
       app.setAsDefaultProtocolClient(OS_REGISTER_SCHEME, process.execPath, [

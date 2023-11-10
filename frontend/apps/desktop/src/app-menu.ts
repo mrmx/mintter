@@ -1,7 +1,7 @@
 // this menu is visible on macOS only
 // the keyboard shortcuts apply to every platform
 
-import {Menu, MenuItem} from 'electron'
+import {Menu, MenuItem, autoUpdater} from 'electron'
 import {dispatchFocusedWindowAppEvent, openRoute, trpc} from './app-api'
 
 export function createAppMenu() {
@@ -14,6 +14,12 @@ export function createAppMenu() {
       submenu: [
         {role: 'about'},
         {type: 'separator'},
+        {
+          label: 'Check for updates',
+          click: () => {
+            autoUpdater.checkForUpdates()
+          },
+        },
         {
           label: 'Settings',
           accelerator: 'CmdOrCtrl+,',
