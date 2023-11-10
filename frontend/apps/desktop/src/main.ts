@@ -49,6 +49,8 @@ const mainDaemon = startMainDaemon()
 
 Menu.setApplicationMenu(createAppMenu())
 
+autoUpdate()
+
 // // check for updates Powered by the free and open-source
 // updater({
 //   updateInterval: '1 hour',
@@ -178,7 +180,7 @@ function autoUpdate() {
     })
 
     autoUpdater.on('error', (message) => {
-      log.debug(
+      log.error(
         `[MAIN]: AUTO-UPDATE: There was a problem updating the application: ${message}`,
       )
       console.error('There was a problem updating the application')
