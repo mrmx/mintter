@@ -28,6 +28,10 @@ import {createAppMenu} from './app-menu'
 const OS_REGISTER_SCHEME = 'hm'
 
 if (IS_PROD_DESKTOP) {
+  if (squirrelStartup) {
+    app.quit()
+  }
+
   if (process.defaultApp) {
     if (process.argv.length >= 2) {
       app.setAsDefaultProtocolClient(OS_REGISTER_SCHEME, process.execPath, [
@@ -36,10 +40,6 @@ if (IS_PROD_DESKTOP) {
     }
   } else {
     app.setAsDefaultProtocolClient(OS_REGISTER_SCHEME)
-  }
-
-  if (squirrelStartup) {
-    app.quit()
   }
 }
 
@@ -147,35 +147,51 @@ function autoUpdate() {
 
   autoUpdater.setFeedURL({url: updateUrl})
 
+  fetch(
+    `https://update.electronjs.org/MintterHypermedia/mintter/darwin-x64/${app.getVersion()}`,
+  ).then((res) => {
+    if (res) {
+      log.debug('[MAIN]: LINUX UPDATE NEED TO UPDATE', res)
+    } else {
+      log.debug('[MAIN]: LINUX LATEST', res)
+    }
+  })
+
   if (IS_PROD_DESKTOP) {
-    setInterval(() => {
-      autoUpdater.checkForUpdates()
-      // check for updates every 10mins
-    }, 60000 * 10)
+    if (process.platform == 'linux') {
+    } else {
+      setInterval(() => {
+        autoUpdater.checkForUpdates()
+        // check for updates every 10mins
+      }, 60000 * 10)
 
-    autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
-      log.debug('[MAIN]: AUTO-UPDATE: New version downloaded')
-      const dialogOpts: MessageBoxOptions = {
-        type: 'info',
-        buttons: ['Restart', 'Later'],
-        title: 'Application Update',
-        message: process.platform === 'win32' ? releaseNotes : releaseName,
-        detail:
-          'A new version has been downloaded. Restart the application to apply the updates.',
-      }
+      autoUpdater.on(
+        'update-downloaded',
+        (event, releaseNotes, releaseName) => {
+          log.debug('[MAIN]: AUTO-UPDATE: New version downloaded')
+          const dialogOpts: MessageBoxOptions = {
+            type: 'info',
+            buttons: ['Restart', 'Later'],
+            title: 'Application Update',
+            message: process.platform === 'win32' ? releaseNotes : releaseName,
+            detail:
+              'A new version has been downloaded. Restart the application to apply the updates.',
+          }
 
-      dialog.showMessageBox(dialogOpts).then((returnValue) => {
-        log.debug('[MAIN]: AUTO-UPDATE: Quit and Install')
-        if (returnValue.response === 0) autoUpdater.quitAndInstall()
-      })
-    })
-
-    autoUpdater.on('error', (message) => {
-      log.error(
-        `[MAIN]: AUTO-UPDATE: There was a problem updating the application: ${message}`,
+          dialog.showMessageBox(dialogOpts).then((returnValue) => {
+            log.debug('[MAIN]: AUTO-UPDATE: Quit and Install')
+            if (returnValue.response === 0) autoUpdater.quitAndInstall()
+          })
+        },
       )
-      console.error('There was a problem updating the application')
-      console.error(message)
-    })
+
+      autoUpdater.on('error', (message) => {
+        log.error(
+          `[MAIN]: AUTO-UPDATE: There was a problem updating the application: ${message}`,
+        )
+        console.error('There was a problem updating the application')
+        console.error(message)
+      })
+    }
   }
 }
