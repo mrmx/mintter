@@ -51,12 +51,6 @@ Menu.setApplicationMenu(createAppMenu())
 
 autoUpdate()
 
-// // check for updates Powered by the free and open-source
-// updater({
-//   updateInterval: '1 hour',
-//   repo: 'mintterteam/mintter',
-// })
-
 //Simple logging module Electron/Node.js/NW.js application. No dependencies. No complicated configuration.
 log.initialize({
   preload: true,
@@ -147,20 +141,17 @@ if (!gotTheLock) {
 }
 
 function autoUpdate() {
-  // const url = `https://update.electronjs.org/MintterHypermedia/mintter/${
-  //   process.platform
-  // }-${process.arch}/${app.getVersion()}`
-
-  // this is for testing
   const updateUrl = `https://update.electronjs.org/MintterHypermedia/mintter/${
     process.platform
   }-${process.arch}/${app.getVersion()}`
+
   autoUpdater.setFeedURL({url: updateUrl})
 
   if (IS_PROD_DESKTOP) {
     setInterval(() => {
       autoUpdater.checkForUpdates()
-    }, 60000)
+      // check for updates every 10mins
+    }, 60000 * 10)
 
     autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
       log.debug('[MAIN]: AUTO-UPDATE: New version downloaded')
