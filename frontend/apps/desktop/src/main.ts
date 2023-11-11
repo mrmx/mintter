@@ -1,15 +1,6 @@
+import {IS_PROD_DESKTOP, MINTTER_SENTRY_DESKTOP_DSN} from '@mintter/shared'
 import * as Sentry from '@sentry/electron/main'
-import {
-  BrowserWindow,
-  Menu,
-  app,
-  ipcMain,
-  nativeTheme,
-  shell,
-  autoUpdater,
-  dialog,
-  MessageBoxOptions,
-} from 'electron'
+import {BrowserWindow, Menu, app, ipcMain, nativeTheme, shell} from 'electron'
 import log from 'electron-log/main'
 import squirrelStartup from 'electron-squirrel-startup'
 import path from 'node:path'
@@ -19,11 +10,11 @@ import {
   openInitialWindows,
   trpc,
 } from './app-api'
+import {createAppMenu} from './app-menu'
 import {initPaths} from './app-paths'
+import autoUpdate from './auto-update'
 import {startMainDaemon} from './daemon'
 import {saveCidAsFile} from './save-cid-as-file'
-import {IS_PROD_DESKTOP, MINTTER_SENTRY_DESKTOP_DSN} from '@mintter/shared'
-import {createAppMenu} from './app-menu'
 
 const OS_REGISTER_SCHEME = 'hm'
 
@@ -45,7 +36,7 @@ if (IS_PROD_DESKTOP) {
 
 initPaths()
 
-const mainDaemon = startMainDaemon()
+startMainDaemon()
 
 Menu.setApplicationMenu(createAppMenu())
 
@@ -138,60 +129,4 @@ if (!gotTheLock) {
       })
     }
   })
-}
-
-function autoUpdate() {
-  const updateUrl = `https://update.electronjs.org/MintterHypermedia/mintter/${
-    process.platform
-  }-${process.arch}/${app.getVersion()}`
-
-  autoUpdater.setFeedURL({url: updateUrl})
-
-  fetch(
-    `https://update.electronjs.org/MintterHypermedia/mintter/darwin-x64/${app.getVersion()}`,
-  ).then((res) => {
-    if (res) {
-      log.debug('[MAIN]: LINUX UPDATE NEED TO UPDATE', res)
-    } else {
-      log.debug('[MAIN]: LINUX LATEST', res)
-    }
-  })
-
-  if (IS_PROD_DESKTOP) {
-    if (process.platform == 'linux') {
-    } else {
-      setInterval(() => {
-        autoUpdater.checkForUpdates()
-        // check for updates every 10mins
-      }, 60000 * 10)
-
-      autoUpdater.on(
-        'update-downloaded',
-        (event, releaseNotes, releaseName) => {
-          log.debug('[MAIN]: AUTO-UPDATE: New version downloaded')
-          const dialogOpts: MessageBoxOptions = {
-            type: 'info',
-            buttons: ['Restart', 'Later'],
-            title: 'Application Update',
-            message: process.platform === 'win32' ? releaseNotes : releaseName,
-            detail:
-              'A new version has been downloaded. Restart the application to apply the updates.',
-          }
-
-          dialog.showMessageBox(dialogOpts).then((returnValue) => {
-            log.debug('[MAIN]: AUTO-UPDATE: Quit and Install')
-            if (returnValue.response === 0) autoUpdater.quitAndInstall()
-          })
-        },
-      )
-
-      autoUpdater.on('error', (message) => {
-        log.error(
-          `[MAIN]: AUTO-UPDATE: There was a problem updating the application: ${message}`,
-        )
-        console.error('There was a problem updating the application')
-        console.error(message)
-      })
-    }
-  }
 }
