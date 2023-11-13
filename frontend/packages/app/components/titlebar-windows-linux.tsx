@@ -156,6 +156,11 @@ export function SystemMenu() {
         title: 'Mintter',
         children: [
           {
+            id: 'updates',
+            title: 'Check for updates',
+            onSelect: () => triggerFocusedWindow('checkForUpdates'),
+          },
+          {
             id: 'preferences',
             title: 'Preferences...',
             accelerator: 'Ctrl+,',
@@ -413,7 +418,7 @@ type SubMenuItemElement = {
   id: string
   title: string
   onSelect: () => void
-  icon: ListItemProps['icon']
+  icon?: ListItemProps['icon']
   accelerator?: string
   disabled?: boolean
 }

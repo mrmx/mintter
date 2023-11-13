@@ -6,6 +6,7 @@ export type AppWindowSimpleEvent =
   | 'forward'
   | 'triggerPeerSync'
   | 'openQuickSwitcher'
+  | 'checkForUpdates'
 
 export type AppWindowEvent =
   | AppWindowSimpleEvent

@@ -1,5 +1,12 @@
 import {IS_PROD_DESKTOP} from '@mintter/shared'
-import {app, autoUpdater, ipcMain, ipcRenderer} from 'electron'
+import {
+  MessageBoxOptions,
+  app,
+  autoUpdater,
+  dialog,
+  ipcMain,
+  ipcRenderer,
+} from 'electron'
 import log from 'electron-log/main'
 import {ipcMainEvents} from './ipc-events'
 
@@ -88,21 +95,21 @@ function setup() {
 
   autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
     log.debug('[MAIN][AUTO-UPDATE]: New version downloaded')
-    // const dialogOpts: MessageBoxOptions = {
-    //   type: 'info',
-    //   buttons: ['Restart', 'Later'],
-    //   title: 'Application Update',
-    //   message: process.platform == 'win32' ? releaseNotes : releaseName,
-    //   detail:
-    //     'A new version has been downloaded. Restart the application to apply the updates.',
-    // }
+    const dialogOpts: MessageBoxOptions = {
+      type: 'info',
+      buttons: ['Restart', 'Later'],
+      title: 'Application Update',
+      message: process.platform == 'win32' ? releaseNotes : releaseName,
+      detail:
+        'A new version has been downloaded. Restart the application to apply the updates.',
+    }
 
-    // dialog.showMessageBox(dialogOpts).then((returnValue: any) => {
-    //   log.debug('[MAIN][AUTO-UPDATE]: Quit and Install')
-    //   if (returnValue.response === 0) autoUpdater.quitAndInstall()
-    // })
+    dialog.showMessageBox(dialogOpts).then((returnValue: any) => {
+      log.debug('[MAIN][AUTO-UPDATE]: Quit and Install')
+      if (returnValue.response === 0) autoUpdater.quitAndInstall()
+    })
 
-    // ipcMain.emit(ipcMainEvents.UPDATE_DOWNLOADED)
+    ipcMain.emit(ipcMainEvents.UPDATE_DOWNLOADED)
     ipcRenderer.emit(ipcMainEvents.UPDATE_DOWNLOADED)
   })
 
