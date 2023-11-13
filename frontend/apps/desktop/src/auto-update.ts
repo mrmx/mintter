@@ -31,7 +31,7 @@ export function linuxCheckForUpdates() {
         log.debug('[MAIN][AUTO-UPDATE]: LINUX NEED TO UPDATE', res)
         const dialogOpts: MessageBoxOptions = {
           type: 'info',
-          buttons: ['Close', 'Go and Download'],
+          buttons: ['Go and Download', 'Close'],
           title: 'Application Update',
           message: 'New release available',
           detail:
