@@ -6,6 +6,7 @@ import {
   dialog,
   ipcMain,
   ipcRenderer,
+  shell,
 } from 'electron'
 import log from 'electron-log/main'
 import {ipcMainEvents} from './ipc-events'
@@ -28,8 +29,24 @@ export function linuxCheckForUpdates() {
     ).then((res) => {
       if (res) {
         log.debug('[MAIN][AUTO-UPDATE]: LINUX NEED TO UPDATE', res)
+        const dialogOpts: MessageBoxOptions = {
+          type: 'info',
+          buttons: ['Close', 'Go and Download'],
+          title: 'Application Update',
+          message: 'New release available',
+          detail:
+            'A new version is available. Go and Download the new version!',
+        }
+
+        dialog.showMessageBox(dialogOpts).then((returnValue: any) => {
+          log.debug('[MAIN][AUTO-UPDATE]: Quit and Install')
+          if (returnValue.response === 0)
+            shell.openExternal(
+              'https://github.com/MintterHypermedia/mintter/releases/latest',
+            )
+        })
       } else {
-        log.debug('[MAIN][AUTO-UPDATE]: LINUX LATEST', res)
+        log.debug('[MAIN][AUTO-UPDATE]: LINUX IS UPDATED', res)
       }
     })
   } catch (error) {}
@@ -53,7 +70,9 @@ export default function autoUpdate() {
     setup()
   }
 
-  checkForUpdates()
+  setTimeout(() => {
+    checkForUpdates()
+  }, 2000)
 
   setInterval(checkForUpdates, 43200000) // every 12 hours
 }
@@ -108,9 +127,6 @@ function setup() {
       log.debug('[MAIN][AUTO-UPDATE]: Quit and Install')
       if (returnValue.response === 0) autoUpdater.quitAndInstall()
     })
-
-    ipcMain.emit(ipcMainEvents.UPDATE_DOWNLOADED)
-    ipcRenderer.emit(ipcMainEvents.UPDATE_DOWNLOADED)
   })
 
   autoUpdater.on('update-not-available', ({version}: any) => {
