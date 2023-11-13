@@ -12,7 +12,8 @@ import {
 } from './app-api'
 import {createAppMenu} from './app-menu'
 import {initPaths} from './app-paths'
-import autoUpdate from './auto-update'
+// import autoUpdate from './auto-update'
+import {setupUpdates} from './update'
 import {startMainDaemon} from './daemon'
 import {saveCidAsFile} from './save-cid-as-file'
 
@@ -40,7 +41,8 @@ startMainDaemon()
 
 Menu.setApplicationMenu(createAppMenu())
 
-autoUpdate()
+// autoUpdate()
+setupUpdates()
 
 //Simple logging module Electron/Node.js/NW.js application. No dependencies. No complicated configuration.
 log.initialize({

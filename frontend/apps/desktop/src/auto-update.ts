@@ -20,7 +20,7 @@ export function linuxCheckForUpdates() {
       `https://update.electronjs.org/MintterHypermedia/mintter/darwin-x64/${app.getVersion()}`,
     ).then((res) => {
       if (res) {
-        log.debug('[MAIN][AUTO-UPDATE]: LINUX UPDATE NEED TO UPDATE', res)
+        log.debug('[MAIN][AUTO-UPDATE]: LINUX NEED TO UPDATE', res)
       } else {
         log.debug('[MAIN][AUTO-UPDATE]: LINUX LATEST', res)
       }
@@ -52,6 +52,8 @@ export default function autoUpdate() {
 }
 
 // ======================================
+
+let feedback = false
 
 function isAutoUpdateSupported() {
   // TODO: we need to enable a setting so people can disable auto-updates
