@@ -1,9 +1,10 @@
-import {GRPCClient, unpackDocId} from '@mintter/shared'
+import {GRPCClient, StateStream, unpackDocId} from '@mintter/shared'
 import {
   UnpackedHypermediaId,
   createHmId,
   unpackHmId,
 } from '@mintter/shared/src/utils/entity-id-url'
+import {useStream, useStreamSelector} from '@mintter/ui'
 import {Buffer} from 'buffer'
 import {createContext, useContext} from 'react'
 
@@ -89,7 +90,7 @@ export type NavState = {
   lastAction: NavAction['type']
 }
 export type NavigationContext = {
-  state: NavState
+  state: StateStream<NavState>
   dispatch: (action: NavAction) => void
 }
 
@@ -205,14 +206,17 @@ export function useNavRoute() {
   const nav = useContext(NavContext)
   if (!nav)
     throw new Error('useNavRoute must be used within a NavigationProvider')
-  return nav.state.routes[nav.state.routeIndex] || {key: 'home'}
+  return useStreamSelector(
+    nav.state,
+    (state) => state.routes[state.routeIndex] || {key: 'home'},
+  )
 }
 
 export function useNavigationState() {
   const nav = useContext(NavContext)
   if (!nav)
     throw new Error('useNavigation must be used within a NavigationProvider')
-  return nav.state
+  return useStream(nav.state)
 }
 
 export function useNavigationDispatch() {
