@@ -1,4 +1,4 @@
-import {Timestamp} from '@bufbuild/protobuf'
+import { Timestamp } from '@bufbuild/protobuf'
 import {
   BACKEND_HTTP_URL,
   Block,
@@ -44,8 +44,8 @@ import {
   YStack,
   YStackProps,
 } from '@mintter/ui'
-import {AlertCircle, Book} from '@tamagui/lucide-icons'
-import {nip19, nip21, validateEvent, verifySignature} from 'nostr-tools'
+import { AlertCircle, Book } from '@tamagui/lucide-icons'
+import { nip19, nip21, validateEvent, verifySignature } from 'nostr-tools'
 import {
   PropsWithChildren,
   createContext,
@@ -53,8 +53,8 @@ import {
   useMemo,
   useState,
 } from 'react'
-import {RiCheckFill, RiCloseCircleLine, RiRefreshLine} from 'react-icons/ri'
-import {HMAccount, HMGroup} from './json-hm'
+import { RiCheckFill, RiCloseCircleLine, RiRefreshLine } from 'react-icons/ri'
+import { HMAccount, HMGroup } from './json-hm'
 import {
   contentLayoutUnit,
   contentTextUnit,
@@ -942,7 +942,7 @@ export function BlockContentEmbed(props: BlockContentProps) {
     return <EmbedTypes.GroupCard {...props} {...id} />
   }
   if (id?.type == 'd') {
-    switch (props.block.attributes.display) {
+    switch (props.block.attributes?.view || 'content') {
       case 'card':
         return <EmbedTypes.PublicationCard {...props} {...id} />
       default:
@@ -954,7 +954,7 @@ export function BlockContentEmbed(props: BlockContentProps) {
 
 export function EmbedContentGroup({group}: {group: HMGroup}) {
   return (
-    <XStack gap="$3" padding="$4" alignItems="flex-start">
+    <XStack gap="$3" padding="$2" alignItems="flex-start">
       <XStack paddingVertical="$3">
         <Book size={36} />
       </XStack>
